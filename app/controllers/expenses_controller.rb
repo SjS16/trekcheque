@@ -47,15 +47,7 @@ class ExpensesController < ApplicationController
         attendee_for_balance.update_attribute(:balance, @attendee_balance)
       end
     end
-    respond_to do |format|
-      if @expense.save
-        format.html { redirect_to @trip, notice: 'Expense was successfully created.' }
-        format.json { render :show, status: :created, location: trip_expenses_path }
-      else
-        format.html { redirect_to @trip, notice: 'Expense not successfully created.' }
-        format.json { render json: @expense.errors, status: :unprocessable_entity }
-      end
-    end
+
   end
   # PATCH/PUT /expenses/1
   # PATCH/PUT /expenses/1.json
@@ -85,6 +77,7 @@ class ExpensesController < ApplicationController
     def set_expense
       @expense = Expense.find(params[:id])
     end
+
     def update_balance
       @willing_payees = @expense.payees.all
       # TODO: this is kinda cavalier about the possibility of errors.  ha ha!

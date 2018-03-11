@@ -1,5 +1,6 @@
 class TripsController < ApplicationController
   before_action :set_trip, only: [:show, :edit, :update, :destroy]
+  before_action :set_costs, only: [:show, :edit, :update]
 
   # GET /trips
   # GET /trips.json
@@ -13,25 +14,25 @@ class TripsController < ApplicationController
     @trips = Trip.all
     @expense = Expense.new
     @attendees = Attendee.where(trip_id: params[:id])
-    @trip_length_night = (@trip.end_date - @trip.start_date).to_i
-    @number_of_possible_attendees = @trip.number_of_possible_attendees
-    @price_per_night = @trip.price_per_night
-    @total_cost = @price_per_night.to_i * @trip_length_night.to_i
-    @total_possible_accomodation_cost_per_person = @total_cost.to_i / @number_of_possible_attendees.to_i
-    @attendees_amount = @attendees.size
-    if @attendees_amount.to_i > 0
-      @total_confirmed_accomodation_cost_per_person = @total_cost.to_i / @attendees_amount.to_i
-      @trips.each do |trip|
-        trip.update_attribute(:total_possible_cost, @total_possible_accomodation_cost_per_person)
-        trip.update_attribute(:total_confirmed_cost, @total_confirmed_accomodation_cost_per_person)
-      end
-    end
-    if @attendees_amount.to_i == 0
-      @trips.each do |trip|
-        trip.update_attribute(:total_possible_cost, @total_possible_accomodation_cost_per_person)
-        trip.update_attribute(:total_confirmed_cost, 0)
-      end
-    end
+    # @trip_length_night = (@trip.end_date - @trip.start_date).to_i
+    # @number_of_possible_attendees = @trip.number_of_possible_attendees
+    # @price_per_night = @trip.price_per_night
+    # @total_cost = @price_per_night.to_i * @trip_length_night.to_i
+    # @total_possible_accomodation_cost_per_person = @total_cost.to_i / @number_of_possible_attendees.to_i
+    # @attendees_amount = @attendees.size
+    # if @attendees_amount.to_i > 0
+    #   @total_confirmed_accomodation_cost_per_person = @total_cost.to_i / @attendees_amount.to_i
+    #   @trips.each do |trip|
+    #     trip.update_attribute(:total_possible_cost, @total_possible_accomodation_cost_per_person)
+    #     trip.update_attribute(:total_confirmed_cost, @total_confirmed_accomodation_cost_per_person)
+    #   end
+    # end
+    # if @attendees_amount.to_i == 0
+    #   @trips.each do |trip|
+    #     trip.update_attribute(:total_possible_cost, @total_possible_accomodation_cost_per_person)
+    #     trip.update_attribute(:total_confirmed_cost, 0)
+    #   end
+    # end
 
     @attendees_ids = []
     
@@ -80,7 +81,7 @@ class TripsController < ApplicationController
 
     respond_to do |format|
       if @trip.save
-        format.html { redirect_to @trip, notice: 'Trip was successfully created.' }
+        format.html { redirect_to trip_path(@trip), notice: 'Trip was successfully created.' }
         format.json { render :show, status: :created, location: @trip }
       else
         format.html { render :new }
@@ -117,6 +118,31 @@ class TripsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_trip
       @trip = Trip.find(params[:id])
+    end
+
+    def set_costs
+      @trips = Trip.all
+      @expense = Expense.new
+      @attendees = Attendee.where(trip_id: params[:id])
+      @trip_length_night = (@trip.end_date - @trip.start_date).to_i
+      @number_of_possible_attendees = @trip.number_of_possible_attendees
+      @price_per_night = @trip.price_per_night
+      @total_cost = @price_per_night.to_i * @trip_length_night.to_i
+      @total_possible_accomodation_cost_per_person = @total_cost.to_i / @number_of_possible_attendees.to_i
+      @attendees_amount = @attendees.size
+      if @attendees_amount.to_i > 0
+        @total_confirmed_accomodation_cost_per_person = @total_cost.to_i / @attendees_amount.to_i
+        @trips.each do |trip|
+          trip.update_attribute(:total_possible_cost, @total_possible_accomodation_cost_per_person)
+          trip.update_attribute(:total_confirmed_cost, @total_confirmed_accomodation_cost_per_person)
+        end
+      end
+      if @attendees_amount.to_i == 0
+        @trips.each do |trip|
+          trip.update_attribute(:total_possible_cost, @total_possible_accomodation_cost_per_person)
+          trip.update_attribute(:total_confirmed_cost, 0)
+        end
+      end
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

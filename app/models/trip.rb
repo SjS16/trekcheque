@@ -6,5 +6,13 @@ class Trip < ApplicationRecord
   has_many :users, :through => :attendees
 
   validates :name, presence: true
+  validates :number_of_possible_attendees, presence: true
+
+  validate :validate_date
+
+  def validate_date
+    errors.add(:start_date, 'must be earlier than end date') if
+    self.start_date >= self.end_date
+  end
 
 end
